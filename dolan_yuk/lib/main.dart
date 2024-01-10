@@ -1,11 +1,29 @@
 import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:dolan_yuk/screen/cari.dart';
 import 'package:dolan_yuk/screen/jadwal.dart';
+import 'package:dolan_yuk/screen/login.dart';
 import 'package:dolan_yuk/screen/profil.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(const MyApp());
+  // runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  checkUser().then((String result) {
+    if (result == '')
+      runApp(MyLogin());
+    else {
+      active_user = result;
+      runApp(MyApp());
+    }
+  });
+}
+
+Future<String> checkUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString("user_id", "");
+  String user_id = prefs.getString("user_id") ?? '';
+  return user_id;
 }
 
 class MyApp extends StatelessWidget {
@@ -20,6 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
       routes: {
         'addjadwal': (context) => AddJadwal(),
