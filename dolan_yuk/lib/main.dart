@@ -21,7 +21,7 @@ void main() {
 
 Future<String> checkUser() async {
   final prefs = await SharedPreferences.getInstance();
-  prefs.setString("user_id", "");
+  // prefs.setString("user_id", "");
   String user_id = prefs.getString("user_id") ?? '';
   return user_id;
 }

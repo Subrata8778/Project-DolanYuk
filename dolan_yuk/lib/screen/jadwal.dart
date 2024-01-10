@@ -4,6 +4,7 @@ import 'package:dolan_yuk/class/jadwalDolan.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:dolan_yuk/screen/addjadwal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JadwalScreen extends StatefulWidget {
   @override
@@ -12,7 +13,13 @@ class JadwalScreen extends StatefulWidget {
 
 class _JadwalScreenState extends State<JadwalScreen> {
   List<JadwalDolan> _jadwalList = [];
-  String userId = "1";
+  String userId = "";
+
+  Future<String> checkUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String user_id = prefs.getString("user_id") ?? '';
+    return user_id;
+  }
 
   Future<String> fetchData() async {
     final response = await http.post(
@@ -44,7 +51,11 @@ class _JadwalScreenState extends State<JadwalScreen> {
   @override
   void initState() {
     super.initState();
-    bacaData();
+    Future<String> userOnly = checkUser();
+    userOnly.then((value){
+      userId = value;
+      bacaData();
+    });
   }
 
   @override
