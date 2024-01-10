@@ -1,3 +1,4 @@
+import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:dolan_yuk/screen/cari.dart';
 import 'package:dolan_yuk/screen/jadwal.dart';
 import 'package:dolan_yuk/screen/profil.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routes: {
+        'addjadwal': (context) => AddJadwal(),
+      },
     );
   }
 }
@@ -52,11 +56,18 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(_title[_currentIndex]),
       ),
       body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.draw),
-      ),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddJadwal()),
+                );
+              },
+              tooltip: 'Tambah Jadwal',
+              child: Icon(Icons.add),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           fixedColor: Colors.teal,

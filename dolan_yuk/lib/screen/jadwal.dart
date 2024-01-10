@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:dolan_yuk/class/jadwalDolan.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:dolan_yuk/screen/addjadwal.dart';
 
 class JadwalScreen extends StatefulWidget {
   @override
@@ -15,9 +16,10 @@ class _JadwalScreenState extends State<JadwalScreen> {
 
   Future<String> fetchData() async {
     final response = await http.post(
-        Uri.parse("http://ubaya.me/flutter/160420002/DolanYuk/jadwal.php"),
-        body: {'users_id': userId});
+        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/jadwal.php"),
+        body: {'users_id': userId.toString()});
     if (response.statusCode == 200) {
+      // print(response.body);
       return response.body;
     } else {
       throw Exception('Failed to read API');
@@ -30,11 +32,12 @@ class _JadwalScreenState extends State<JadwalScreen> {
     data.then((value) {
       Map json = jsonDecode(value);
       for (var jad in json['data']) {
+        print(jad);
         JadwalDolan jd = JadwalDolan.fromJson(jad);
         _jadwalList.add(jd);
       }
       setState(() {});
-      print(_jadwalList);
+      // print(_jadwalList);
     });
   }
 
@@ -59,37 +62,46 @@ class _JadwalScreenState extends State<JadwalScreen> {
                   child: Column(
                     children: [
                       // Foto
-                      Image.network(
-                        _jadwalList[index].photo,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+                      Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(_jadwalList[index].photo),
+                              fit: BoxFit.cover,
+                            ),
+                            // shape: BoxShape.circle,
+                          )),
                       // Informasi Dolanan
                       ListTile(
-                        title: Text(_jadwalList[index].nama),
-                      ),
-                      // Alamat
-                      ListTile(
-                        leading: Icon(Icons.location_on),
-                        title: Text(_jadwalList[index].alamat),
-                      ),
-                      // Nama Tempat
-                      ListTile(
-                        leading: Icon(Icons.place),
-                        title: Text(_jadwalList[index].lokasi),
+                        title: Text(
+                          _jadwalList[index].nama,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       // Tanggal dan Jam
                       ListTile(
                         leading: Icon(Icons.calendar_today),
-                        title: Text(
-                            "${DateFormat.yMd().format(_jadwalList[index].timestamp)} | ${DateFormat.Hm().format(_jadwalList[index].timestamp)}"),
+                        title:
+                            Text("${_jadwalList[index].timestamp.toString()}"),
                       ),
                       // Jumlah Pemain
                       ListTile(
                         leading: Icon(Icons.group),
                         title: Text(
-                            "Jumlah Pemain: ${_jadwalList[index].jumlahPemain}"),
+                            "1 / ${_jadwalList[index].jumlahPemain} orang"),
+                      ),
+                      // Nama Tempat
+                      ListTile(
+                        leading: Icon(Icons.house),
+                        title: Text(_jadwalList[index].lokasi),
+                      ),
+                      // Alamat
+                      ListTile(
+                        leading: Icon(Icons.location_on),
+                        title: Text(_jadwalList[index].alamat),
                       ),
                       // Tombol Group Chat
                       ElevatedButton(
@@ -99,7 +111,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                           // atau tampilkan dialog obrolan di sini.
                           // ...
                         },
-                        child: Text("Group Chat"),
+                        child: Text("Party Chat"),
                       ),
                     ],
                   ),

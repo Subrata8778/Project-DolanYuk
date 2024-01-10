@@ -1,7 +1,7 @@
 class JadwalDolan {
-  final String id;
+  final int id;
   final String nama;
-  final DateTime timestamp; // Ubah ke DateTime
+  final DateTime timestamp;
   final String lokasi;
   final String alamat;
   final String photo;
@@ -19,13 +19,13 @@ class JadwalDolan {
 
   factory JadwalDolan.fromJson(Map<String, dynamic> json) {
     return JadwalDolan(
-      id: json['jadwals_id'],
+      id: json['id'] as int,
       nama: json['nama'],
-      timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000), // Ubah ke DateTime
+      timestamp: DateTime.parse(json['tanggal']), // Ubah ke DateTime
       lokasi: json['lokasi'],
       alamat: json['alamat'],
       photo: json['photo'],
-      jumlahPemain: json['jumlah_pemain'],
+      jumlahPemain: json['jumlah_minimal'] as int,
     );
   }
 }
