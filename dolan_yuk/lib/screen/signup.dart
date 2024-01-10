@@ -1,13 +1,13 @@
+import 'package:dolan_yuk/screen/login.dart';
 import 'package:flutter/material.dart';
 import 'package:dolan_yuk/main.dart';
-import 'package:dolan_yuk/screen/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 String active_user = "";
 
-class MyLogin extends StatelessWidget {
+class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,40 +15,43 @@ class MyLogin extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Login(),
+      home: Register(),
       routes: {
-        'singup': (context) => SignUp(),
+        'login': (context) => MyLogin(),
       },
     );
   }
 }
 
-class Login extends StatefulWidget {
+class Register extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _LoginState();
+    return _RegisterState();
   }
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
+  String _nama = '';
   String _email = '';
   String _password = '';
   String error_login = '';
 
-  void doLogin() async {
+  void doRegister() async {
     final response = await http.post(
-        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/login.php"),
-        body: {'email': _email, 'user_password': _password});
+        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/register.php"),
+        body: {
+          'nama': _nama, 
+          'email': _email, 
+          'photo': "https://static.wikia.nocookie.net/larva-animation/images/6/6a/BrownPose.png/revision/latest?cb=20210418181805",
+          'user_password': _password});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString("user_id", json['data']['id'].toString());
-        main();
+        Navigator.pushReplacementNamed(context, "login");
       } else {
         print(json['message']);
         setState(() {
-          error_login = "Incorrect user or password";
+          error_login = "Gagal register";
         });
       }
     } else {
@@ -63,7 +66,7 @@ class _LoginState extends State<Login> {
           title: Text('Login'),
         ),
         body: Container(
-          height: 350,
+          height: 500,
           margin: EdgeInsets.all(20),
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -76,12 +79,24 @@ class _LoginState extends State<Login> {
               padding: EdgeInsets.all(10),
               child: TextField(
                 onChanged: (v) {
+                  _nama = v;
+                },
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nama Lengkap',
+                    hintText: 'Masukkan nama lengkap anda disini'),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                onChanged: (v) {
                   _email = v;
                 },
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
-                    hintText: 'Masukkan valid email seperti abc@gmail.com'),
+                    hintText: 'Masukkan email anda'),
               ),
             ),
             Padding(
@@ -95,28 +110,24 @@ class _LoginState extends State<Login> {
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
-                    hintText: 'Masukkan Password anda'),
+                    hintText: 'Masukkan Password'),
               ),
             ),
             Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: 300,
-                  decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "singup");
-                    },
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(color: Colors.white, fontSize: 25),
-                    ),
-                  ),
-                )),
-            Padding(
+              padding: EdgeInsets.all(10),
+              //padding: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
+                onChanged: (v) {
+                  // _password = v;
+                },
+                obscureText: true,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Ulangi Password',
+                    hintText: 'Ulangi Password Anda'),
+              ),
+            ),
+          Padding(
                 padding: EdgeInsets.all(10),
                 child: Container(
                   height: 50,
@@ -126,10 +137,28 @@ class _LoginState extends State<Login> {
                       borderRadius: BorderRadius.circular(20)),
                   child: ElevatedButton(
                     onPressed: () {
-                      doLogin();
+                      Navigator.pushNamed(context, "login");
                     },
                     child: Text(
-                      'Sign In',
+                      'Kembali',
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
+                  ),
+                )),
+          Padding(
+                padding: EdgeInsets.all(10),
+                child: Container(
+                  height: 50,
+                  width: 300,
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      doRegister();
+                    },
+                    child: Text(
+                      'Sign Up',
                       style: TextStyle(color: Colors.white, fontSize: 25),
                     ),
                   ),
