@@ -22,11 +22,9 @@ class _CariState extends State<Cari> {
   Future<List> cariJadwal() async {
     Map json;
     final response = await http.post(
-      Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/carijadwal.php"),
-      body: {'users_id': userId}
-    );
+        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/carijadwal.php"),
+        body: {'users_id': userId});
     if (response.statusCode == 200) {
-      print(response.body);
       json = jsonDecode(response.body);
       return json['data'];
     } else {
@@ -47,11 +45,75 @@ class _CariState extends State<Cari> {
     }
   }
 
+  void Join(String jadwalsId) async {
+    // Mendapatkan objek JadwalDolan yang sesuai dengan jadwalsId
+    JadwalDolan selectedJadwal = _jadwalList.firstWhere(
+      (jadwal) => jadwal.id.toString() == jadwalsId,
+      orElse: () => JadwalDolan(
+          id: 0,
+          nama: '',
+          timestamp: DateTime.now(),
+          lokasi: '',
+          alamat: '',
+          photo: '',
+          jumlahPemain: 0),
+    );
+
+    // Pastikan bahwa objek JadwalDolan yang ditemukan memiliki data yang valid
+    if (selectedJadwal.id != null) {
+      try {
+        final response = await http.post(
+          Uri.parse(
+              "https://ubaya.me/flutter/160420002/DolanYuk/addjadwal.php"),
+          body: {
+            'tanggal':
+                selectedJadwal.timestamp.toUtc().toString().split('.')[0],
+            'lokasi': selectedJadwal.lokasi,
+            'alamat': selectedJadwal.alamat,
+            'users_id': userId,
+            'dolans_id': selectedJadwal.id.toString(),
+            'jadwals_id': selectedJadwal.id.toString(),
+          },
+        );
+
+        if (response.statusCode == 200) {
+          Map json = jsonDecode(response.body);
+          if (json['result'] == 'success') {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Berhasil Bergabung pada Jadwal')),
+            );
+            // Refresh list setelah berhasil join
+            setState(() {
+              loadJadwalList();
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Gagal Bergabung pada Jadwal')),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${response.reasonPhrase}')),
+          );
+          print('HTTP Error: ${response.reasonPhrase}');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan')),
+        );
+        print('Error: $e');
+      }
+    } else {
+      print('JadwalDolan not found for id: $jadwalsId');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     Future<String> userOnly = checkUser();
-    userOnly.then((value){
+    userOnly.then((value) {
       userId = value;
       loadJadwalList();
     });
@@ -96,7 +158,7 @@ class _CariState extends State<Cari> {
                 onPressed: () {
                   // _tampilkanAnggotaBergabung(_jadwalList[index]);
                 },
-                child: Text('Anggota Bergabung'),
+                child: Text('Daftar Anggota'),
               ),
               ListTile(
                 leading: Icon(Icons.group),
@@ -115,7 +177,7 @@ class _CariState extends State<Cari> {
               SizedBox(width: 8.0),
               ElevatedButton(
                 onPressed: () {
-                  // _bergabungPadaJadwal(_jadwalList[index]);
+                  Join(_jadwalList[index].id.toString());
                 },
                 child: Text('Join'),
               ),
@@ -152,10 +214,5 @@ class _CariState extends State<Cari> {
         );
       },
     );
-  }
-
-  void _bergabungPadaJadwal(JadwalDolan jadwal) {
-    // Implementasi untuk proses bergabung pada jadwal
-    // ...
   }
 }

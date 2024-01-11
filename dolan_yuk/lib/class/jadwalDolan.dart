@@ -24,7 +24,7 @@ class JadwalDolan {
       timestamp: DateTime.parse(json['tanggal']), // Ubah ke DateTime
       lokasi: json['lokasi'],
       alamat: json['alamat'],
-      photo: json['photo'],
+      photo: json["photo"],
       jumlahPemain: json['jumlah_minimal'] as int,
     );
   }
