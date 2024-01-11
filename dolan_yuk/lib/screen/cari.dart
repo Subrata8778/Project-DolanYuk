@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class Cari extends StatefulWidget {
   @override
@@ -244,7 +245,15 @@ class _CariState extends State<Cari> {
                     // Tanggal dan Jam
                     ListTile(
                       leading: Icon(Icons.calendar_today),
-                      title: Text("${_jadwalList[index].timestamp.toString()}"),
+                      title: Text(
+                        "${DateFormat('dd-MM-yyyy').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.punch_clock),
+                      title: Text(
+                        "${DateFormat('HH:mm').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
+                      ),
                     ),
                     // Jumlah Pemain
                     ElevatedButton(
