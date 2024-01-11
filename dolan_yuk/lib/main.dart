@@ -59,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _currentIndex = 0;
   final List<Widget> _screens = [JadwalScreen(), Cari(), ProfileScreen()];
-  final List<String> _title = ['DolanYuk', 'Cari', 'Profil'];
 
   void _incrementCounter() {
     setState(() {
@@ -72,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(_title[_currentIndex]),
+        title: Text("DolanYuk"),
       ),
       body: _screens[_currentIndex],
       floatingActionButton: _currentIndex == 0

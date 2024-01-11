@@ -54,9 +54,6 @@ class _AddJadwalState extends State<AddJadwal> {
         : Dolan(id: 0, nama: '', jumlah_minimal: 0, photo: '');
     print(selectedDolanObj.id);
 
-    // Dapatkan foto dari objek Dolan yang sudah ada
-    String photo = selectedDolanObj.photo;
-
     final response = await http.post(
         Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/addjadwal.php"),
         body: {
@@ -67,7 +64,6 @@ class _AddJadwalState extends State<AddJadwal> {
           'dolans_id': selectedDolanObj.id.toString(),
           'jadwals_id': selectedDolanIndex.toString(),
         });
-    print(response.body);
 
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
