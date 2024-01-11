@@ -13,7 +13,7 @@ class SignUp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
       home: Register(),
       routes: {
@@ -34,29 +34,66 @@ class _RegisterState extends State<Register> {
   String _nama = '';
   String _email = '';
   String _password = '';
+  String _re_password = '';
   String error_login = '';
 
   void doRegister() async {
-    final response = await http.post(
-        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/register.php"),
-        body: {
-          'nama': _nama, 
-          'email': _email, 
-          'photo': "https://static.wikia.nocookie.net/larva-animation/images/6/6a/BrownPose.png/revision/latest?cb=20210418181805",
-          'user_password': _password});
-    if (response.statusCode == 200) {
-      Map json = jsonDecode(response.body);
-      if (json['result'] == 'success') {
-        Navigator.pushReplacementNamed(context, "login");
+    if (_nama != "" && _email != "" && _password != "" && _re_password != "") {
+      if (_password == _re_password) {
+        final response = await http.post(
+            Uri.parse(
+                "https://ubaya.me/flutter/160420002/DolanYuk/register.php"),
+            body: {
+              'nama': _nama,
+              'email': _email,
+              'photo':
+                  "https://static.wikia.nocookie.net/larva-animation/images/6/6a/BrownPose.png/revision/latest?cb=20210418181805",
+              'user_password': _password
+            });
+        if (response.statusCode == 200) {
+          Map json = jsonDecode(response.body);
+          if (json['result'] == 'success') {
+            showDialogMsg(
+                "Yeay, Berhasil Signup!", "Silahkan login dengan akun Anda..");
+            Navigator.pushReplacementNamed(context, "login");
+          } else {
+            showDialogMsg(
+                "Gagal Signup!", "Pastikan semua isian terisi dengan benar!");
+            setState(() {
+              error_login = "Gagal register";
+            });
+          }
+        } else {
+          throw Exception('Failed to read API');
+        }
       } else {
-        print(json['message']);
-        setState(() {
-          error_login = "Gagal register";
-        });
+        showDialogMsg("Gagal Signup!",
+            "Pastikan password dan ulangi password berisi sama!");
       }
     } else {
-      throw Exception('Failed to read API');
+      showDialogMsg(
+          "Gagal Signup!", "Pastikan semua isian terisi dengan benar!");
     }
+  }
+
+  void showDialogMsg(String judul, String pesan) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(judul),
+          content: Text(pesan),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -118,7 +155,7 @@ class _RegisterState extends State<Register> {
               //padding: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
                 onChanged: (v) {
-                  // _password = v;
+                  _re_password = v;
                 },
                 obscureText: true,
                 decoration: InputDecoration(
@@ -127,42 +164,65 @@ class _RegisterState extends State<Register> {
                     hintText: 'Ulangi Password Anda'),
               ),
             ),
-          Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: 300,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "login");
-                    },
-                    child: Text(
-                      'Kembali',
-                      style: TextStyle(color: Colors.white, fontSize: 25),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 50,
+                    width: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      border: Border.all(color: Colors.deepPurple, width: 2),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "login");
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent),
+                        elevation: MaterialStateProperty.all<double>(0),
+                      ),
+                      child: Text(
+                        'Kembali',
+                        style: TextStyle(color: Colors.deepPurple, fontSize: 18),
+                      ),
                     ),
                   ),
-                )),
-          Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: 300,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      doRegister();
-                    },
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(color: Colors.white, fontSize: 25),
+                  Container(
+                    height: 50,
+                    width: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        doRegister();
+                      },
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.deepPurple),
+                        elevation: MaterialStateProperty.all<double>(0),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
                     ),
                   ),
-                )),
+                ],
+              ),
+            ),
           ]),
         ));
   }

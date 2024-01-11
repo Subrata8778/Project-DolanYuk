@@ -13,7 +13,7 @@ class MyLogin extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
       home: Login(),
       routes: {
@@ -36,24 +36,48 @@ class _LoginState extends State<Login> {
   String error_login = '';
 
   void doLogin() async {
-    final response = await http.post(
-        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/login.php"),
-        body: {'email': _email, 'user_password': _password});
-    if (response.statusCode == 200) {
-      Map json = jsonDecode(response.body);
-      if (json['result'] == 'success') {
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString("user_id", json['data']['id'].toString());
-        main();
+    if (_email != "" && _password != "") {
+      final response = await http.post(
+          Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/login.php"),
+          body: {'email': _email, 'user_password': _password});
+      if (response.statusCode == 200) {
+        Map json = jsonDecode(response.body);
+        if (json['result'] == 'success') {
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString("user_id", json['data']['id'].toString());
+          main();
+        } else {
+          showDialogMsg("Gagal Login!", "Pastikan email dan password sesuai!");
+          setState(() {
+            error_login = "Incorrect user or password";
+          });
+        }
       } else {
-        print(json['message']);
-        setState(() {
-          error_login = "Incorrect user or password";
-        });
+        throw Exception('Failed to read API');
       }
     } else {
-      throw Exception('Failed to read API');
+      showDialogMsg("Gagal Login!", "Pastikan email dan password terisi dengan benar!");
     }
+  }
+
+  void showDialogMsg(String judul, String pesan) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(judul),
+          content: Text(pesan),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -99,41 +123,62 @@ class _LoginState extends State<Login> {
               ),
             ),
             Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: 300,
-                  decoration: BoxDecoration(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 50,
+                    width: 150,
+                    decoration: BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "singup");
-                    },
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(color: Colors.white, fontSize: 25),
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      border: Border.all(color: Colors.deepPurple, width: 2),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUp()),
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent),
+                        elevation: MaterialStateProperty.all<double>(0),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(color: Colors.deepPurple, fontSize: 18),
+                      ),
                     ),
                   ),
-                )),
-            Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: 300,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      doLogin();
-                    },
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(color: Colors.white, fontSize: 25),
+                  Container(
+                    height: 50,
+                    width: 150,
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        doLogin();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent),
+                        elevation: MaterialStateProperty.all<double>(0),
+                      ),
+                      child: Text(
+                        'Sign In',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
                     ),
                   ),
-                )),
+                ],
+              ),
+            ),
           ]),
         ));
   }

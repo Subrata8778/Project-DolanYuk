@@ -46,14 +46,22 @@ class _NgobrolState extends State<Ngobrol> {
       for (var chatMes in json['data']) {
         DateTime dateTimeChat = DateTime.parse(chatMes['tanggal']);
         if (chatMes['users_id'].toString() == userId) {
-          String formattedDate = DateFormat('dd-MM-yyyy HH:mm').format(dateTimeChat);
-          ChatMessages cm =
-              ChatMessages(message: chatMes['chat'], isUser: true, senderName: "You", timestamp: formattedDate);
+          String formattedDate =
+              DateFormat('dd-MM-yyyy HH:mm').format(dateTimeChat);
+          ChatMessages cm = ChatMessages(
+              message: chatMes['chat'],
+              isUser: true,
+              senderName: "You",
+              timestamp: formattedDate);
           messages.add(cm);
         } else {
-          String formattedDate = DateFormat('dd-MM-yyyy HH:mm').format(dateTimeChat);
-          ChatMessages cm =
-              ChatMessages(message: chatMes['chat'], isUser: false, senderName: chatMes['nama'], timestamp: formattedDate);
+          String formattedDate =
+              DateFormat('dd-MM-yyyy HH:mm').format(dateTimeChat);
+          ChatMessages cm = ChatMessages(
+              message: chatMes['chat'],
+              isUser: false,
+              senderName: chatMes['nama'],
+              timestamp: formattedDate);
           messages.add(cm);
         }
       }
@@ -101,7 +109,11 @@ class _NgobrolState extends State<Ngobrol> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: 'Tulis pesan...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.deepPurple),
+                      ),
                     ),
                   ),
                 ),
@@ -163,8 +175,6 @@ class _NgobrolState extends State<Ngobrol> {
       } else {
         throw Exception('Failed to read API');
       }
-    } else {
-      print("Masukkan pesan Anda!");
     }
   }
 }
@@ -188,20 +198,22 @@ class ChatMessages extends StatelessWidget {
       crossAxisAlignment:
           isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Text(
-          senderName,
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 12,
-          ),
-        ),
+        Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+            child: Text(
+              senderName,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            )),
         Align(
           alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             margin: EdgeInsets.all(8),
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isUser ? Colors.blue : Colors.grey,
+              color: isUser ? Colors.deepPurple : Colors.grey,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
