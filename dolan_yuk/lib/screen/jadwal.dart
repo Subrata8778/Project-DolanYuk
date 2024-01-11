@@ -1,3 +1,4 @@
+import 'package:dolan_yuk/screen/ngobrol.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dolan_yuk/class/jadwalDolan.dart';
@@ -49,7 +50,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
   void initState() {
     super.initState();
     Future<String> userOnly = checkUser();
-    userOnly.then((value){
+    userOnly.then((value) {
       userId = value;
       bacaData();
     });
@@ -114,10 +115,11 @@ class _JadwalScreenState extends State<JadwalScreen> {
                       // Tombol Group Chat
                       ElevatedButton(
                         onPressed: () {
-                          // Tambahkan logika untuk akses group chat
-                          // Misalnya, pindahkan pengguna ke halaman obrolan
-                          // atau tampilkan dialog obrolan di sini.
-                          // ...
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Ngobrol(_jadwalList[index].id.toString())),
+                          );
                         },
                         child: Text("Party Chat"),
                       ),

@@ -3,6 +3,7 @@ import 'package:dolan_yuk/class/dolan.dart';
 import 'package:flutter/material.dart';
 import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class AddJadwal extends StatefulWidget {
@@ -26,6 +27,15 @@ class _AddJadwalState extends State<AddJadwal> {
 
   // Initialize minimalMemberList
   List<int> minimalMemberList = [];
+
+  //Ambil userId user saat ini.
+  String userId = "";
+
+  Future<String> checkUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String user_id = prefs.getString("user_id") ?? '';
+    return user_id;
+  }
 
   Future<List> daftarDolan() async {
     Map json;
@@ -60,7 +70,7 @@ class _AddJadwalState extends State<AddJadwal> {
           'tanggal': tanggal.toUtc().toString().split('.')[0],
           'lokasi': lokasiController.text,
           'alamat': alamatController.text,
-          'users_id': '1',
+          'users_id': userId,
           'dolans_id': selectedDolanObj.id.toString(),
           'jadwals_id': selectedDolanIndex.toString(),
         });
@@ -71,7 +81,8 @@ class _AddJadwalState extends State<AddJadwal> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
-        Navigator.of(context).pop();
+        // Navigator.of(context).pop();
+        Navigator.pushNamed(context, 'jadwal');
       }
     } else {
       ScaffoldMessenger.of(context)
@@ -97,7 +108,11 @@ class _AddJadwalState extends State<AddJadwal> {
   @override
   void initState() {
     super.initState();
-    loadDolanList();
+    Future<String> userOnly = checkUser();
+    userOnly.then((value){
+      userId = value;
+      loadDolanList();
+    });
   }
 
   @override

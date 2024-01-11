@@ -2,6 +2,7 @@ import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:dolan_yuk/screen/cari.dart';
 import 'package:dolan_yuk/screen/jadwal.dart';
 import 'package:dolan_yuk/screen/login.dart';
+import 'package:dolan_yuk/screen/ngobrol.dart';
 import 'package:dolan_yuk/screen/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
       routes: {
         'addjadwal': (context) => AddJadwal(),
+        'jadwal': (context) => JadwalScreen(),
       },
     );
   }
