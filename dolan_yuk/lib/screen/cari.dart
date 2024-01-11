@@ -12,6 +12,7 @@ class Cari extends StatefulWidget {
 class _CariState extends State<Cari> {
   List<JadwalDolan> _jadwalList = [];
   String userId = "";
+  TextEditingController searchController = TextEditingController();
 
   Future<String> checkUser() async {
     final prefs = await SharedPreferences.getInstance();
@@ -35,6 +36,7 @@ class _CariState extends State<Cari> {
   Future<void> loadJadwalList() async {
     try {
       List<dynamic> data = await cariJadwal();
+      print(data);
       setState(() {
         _jadwalList = data
             .map<JadwalDolan>((item) => JadwalDolan.fromJson(item))
@@ -46,33 +48,14 @@ class _CariState extends State<Cari> {
   }
 
   void Join(String jadwalsId) async {
-    // Mendapatkan objek JadwalDolan yang sesuai dengan jadwalsId
-    JadwalDolan selectedJadwal = _jadwalList.firstWhere(
-      (jadwal) => jadwal.id.toString() == jadwalsId,
-      orElse: () => JadwalDolan(
-          id: 0,
-          nama: '',
-          timestamp: DateTime.now(),
-          lokasi: '',
-          alamat: '',
-          photo: '',
-          jumlahPemain: 0),
-    );
-
     // Pastikan bahwa objek JadwalDolan yang ditemukan memiliki data yang valid
-    if (selectedJadwal.id != null) {
+    if (jadwalsId != null) {
       try {
         final response = await http.post(
-          Uri.parse(
-              "https://ubaya.me/flutter/160420002/DolanYuk/addjadwal.php"),
+          Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/join.php"),
           body: {
-            'tanggal':
-                selectedJadwal.timestamp.toUtc().toString().split('.')[0],
-            'lokasi': selectedJadwal.lokasi,
-            'alamat': selectedJadwal.alamat,
             'users_id': userId,
-            'dolans_id': selectedJadwal.id.toString(),
-            'jadwals_id': selectedJadwal.id.toString(),
+            'jadwals_id': jadwalsId,
           },
         );
 
@@ -109,6 +92,32 @@ class _CariState extends State<Cari> {
     }
   }
 
+  void searchJadwal(String keyword) async {
+    // Melakukan pencarian berdasarkan nama dolan
+    try {
+      final response = await http.post(
+        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/carijadwal.php"),
+        body: {
+          'users_id': userId,
+          'keyword': keyword,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map json = jsonDecode(response.body);
+        setState(() {
+          _jadwalList = json['data']
+              .map<JadwalDolan>((item) => JadwalDolan.fromJson(item))
+              .toList();
+        });
+      } else {
+        throw Exception('Failed to read API');
+      }
+    } catch (e) {
+      print('Error searching jadwal: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -122,68 +131,90 @@ class _CariState extends State<Cari> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: _jadwalList.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: EdgeInsets.all(8.0),
-            child: Column(children: [
-              // Foto
-              Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(_jadwalList[index].photo),
-                      fit: BoxFit.cover,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                // Memanggil metode pencarian ketika nilai berubah
+                searchJadwal(value);
+              },
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _jadwalList.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: EdgeInsets.all(8.0),
+                  child: Column(children: [
+                    // Foto
+                    Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(_jadwalList[index].photo),
+                            fit: BoxFit.cover,
+                          ),
+                          // shape: BoxShape.circle,
+                        )),
+                    // Informasi Dolanan
+                    ListTile(
+                      title: Text(
+                        _jadwalList[index].nama,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    // shape: BoxShape.circle,
-                  )),
-              // Informasi Dolanan
-              ListTile(
-                title: Text(
-                  _jadwalList[index].nama,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              // Tanggal dan Jam
-              ListTile(
-                leading: Icon(Icons.calendar_today),
-                title: Text("${_jadwalList[index].timestamp.toString()}"),
-              ),
-              // Jumlah Pemain
-              ElevatedButton(
-                onPressed: () {
-                  // _tampilkanAnggotaBergabung(_jadwalList[index]);
-                },
-                child: Text('Daftar Anggota'),
-              ),
-              ListTile(
-                leading: Icon(Icons.group),
-                title: Text("1 / ${_jadwalList[index].jumlahPemain} orang"),
-              ),
-              // Nama Tempat
-              ListTile(
-                leading: Icon(Icons.house),
-                title: Text(_jadwalList[index].lokasi),
-              ),
-              // Alamat
-              ListTile(
-                leading: Icon(Icons.location_on),
-                title: Text(_jadwalList[index].alamat),
-              ),
-              SizedBox(width: 8.0),
-              ElevatedButton(
-                onPressed: () {
-                  Join(_jadwalList[index].id.toString());
-                },
-                child: Text('Join'),
-              ),
-            ]),
-          );
-        },
+                    // Tanggal dan Jam
+                    ListTile(
+                      leading: Icon(Icons.calendar_today),
+                      title: Text("${_jadwalList[index].timestamp.toString()}"),
+                    ),
+                    // Jumlah Pemain
+                    ElevatedButton(
+                      onPressed: () {
+                        // _tampilkanAnggotaBergabung(_jadwalList[index]);
+                      },
+                      child: Text('Daftar Anggota'),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.group),
+                      title:
+                          Text("1 / ${_jadwalList[index].jumlahPemain} orang"),
+                    ),
+                    // Nama Tempat
+                    ListTile(
+                      leading: Icon(Icons.house),
+                      title: Text(_jadwalList[index].lokasi),
+                    ),
+                    // Alamat
+                    ListTile(
+                      leading: Icon(Icons.location_on),
+                      title: Text(_jadwalList[index].alamat),
+                    ),
+                    SizedBox(width: 8.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Join(_jadwalList[index].id.toString());
+                        print(_jadwalList[index].id.toString());
+                      },
+                      child: Text('Join'),
+                    ),
+                  ]),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

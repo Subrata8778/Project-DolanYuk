@@ -38,6 +38,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
     Future<String> data = fetchData();
     data.then((value) {
       Map json = jsonDecode(value);
+      print(json['data']);
       for (var jad in json['data']) {
         JadwalDolan jd = JadwalDolan.fromJson(jad);
         _jadwalList.add(jd);
