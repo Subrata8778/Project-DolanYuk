@@ -36,7 +36,6 @@ class _CariState extends State<Cari> {
   Future<void> loadJadwalList() async {
     try {
       List<dynamic> data = await cariJadwal();
-      print(data);
       setState(() {
         _jadwalList = data
             .map<JadwalDolan>((item) => JadwalDolan.fromJson(item))
@@ -118,6 +117,75 @@ class _CariState extends State<Cari> {
     }
   }
 
+  void tampilkanAnggotaBergabung(String jadwalsId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            "https://ubaya.me/flutter/160420002/DolanYuk/memberdolan.php"),
+        body: {
+          'jadwals_id': jadwalsId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> json = jsonDecode(response.body);
+        if (json['result'] == 'success') {
+          List<Map<String, dynamic>> anggotaList = List.from(json['data']);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Column(
+                  children: [
+                    Text('Konco Dolanan'),
+                    Text(
+                        'Member bergabung: ${anggotaList.length}/${anggotaList[0]['jumlah_minimal']}'),
+                    ...anggotaList.map(
+                      (anggota) => ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(anggota['photo']),
+                        ),
+                        title: Text(
+                          anggota['users_id'] == userId
+                              ? '${anggota['nama']} (You)'
+                              : anggota['nama'],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Keren!'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal mendapatkan data anggota bergabung'),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.reasonPhrase}')),
+        );
+        print('HTTP Error: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan')),
+      );
+      print('Error: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -181,14 +249,18 @@ class _CariState extends State<Cari> {
                     // Jumlah Pemain
                     ElevatedButton(
                       onPressed: () {
-                        // _tampilkanAnggotaBergabung(_jadwalList[index]);
+                        tampilkanAnggotaBergabung(
+                            _jadwalList[index].id.toString());
                       },
-                      child: Text('Daftar Anggota'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.group),
-                      title:
-                          Text("1 / ${_jadwalList[index].jumlahPemain} orang"),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.car_rental_outlined),
+                          SizedBox(width: 8.0),
+                          Text(
+                              "${_jadwalList[index].banyakPemain} / ${_jadwalList[index].jumlahPemain} orang"),
+                        ],
+                      ),
                     ),
                     // Nama Tempat
                     ListTile(
@@ -202,10 +274,10 @@ class _CariState extends State<Cari> {
                     ),
                     SizedBox(width: 8.0),
                     ElevatedButton(
-                      onPressed: () {
-                        Join(_jadwalList[index].id.toString());
-                        print(_jadwalList[index].id.toString());
-                      },
+                      onPressed: (_jadwalList[index].banyakPemain <
+                              _jadwalList[index].jumlahPemain)
+                          ? () => Join(_jadwalList[index].id.toString())
+                          : null,
                       child: Text('Join'),
                     ),
                   ]),
@@ -215,34 +287,6 @@ class _CariState extends State<Cari> {
           ),
         ],
       ),
-    );
-  }
-
-  void _tampilkanAnggotaBergabung(JadwalDolan jadwal) {
-    // Implementasi untuk menampilkan anggota yang telah bergabung
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Anggota yang Telah Bergabung'),
-          content: Column(
-            children: [
-              Text(
-                  '1 member bergabung dari total {jadwal.minimalMember} minimal member'),
-              // Tampilkan daftar anggota yang telah bergabung di sini
-              // ...
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Tutup'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -17,6 +17,10 @@ class _AddJadwalState extends State<AddJadwal> {
   TextEditingController jamController = TextEditingController();
   TextEditingController lokasiController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
+  TextEditingController dateTimeController = TextEditingController();
+
+  late DateTime dtPicker;
+  late TimeOfDay tPicker;
 
   // Variabel untuk menyimpan pilihan dolan utama
   String selectedDolan = '';
@@ -51,8 +55,15 @@ class _AddJadwalState extends State<AddJadwal> {
   }
 
   void addJadwal() async {
-    DateTime tanggal =
-        DateTime.tryParse(tanggalController.text) ?? DateTime.now();
+    DateTime combinedDateTime = DateTime(
+      dtPicker.year,
+      dtPicker.month,
+      dtPicker.day,
+      tPicker.hour,
+      tPicker.minute,
+    );
+
+    dateTimeController.text = combinedDateTime.toLocal().toString();
 
     // Temukan indeks objek Dolan yang sesuai dengan nama yang dipilih
     int selectedDolanIndex =
@@ -67,7 +78,8 @@ class _AddJadwalState extends State<AddJadwal> {
     final response = await http.post(
         Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/addjadwal.php"),
         body: {
-          'tanggal': tanggal.toUtc().toString().split('.')[0],
+          // 'tanggal': tanggal.toUtc().toString().split('.')[0],
+          'tanggal': dateTimeController.text,
           'lokasi': lokasiController.text,
           'alamat': alamatController.text,
           'users_id': userId,
@@ -99,6 +111,7 @@ class _AddJadwalState extends State<AddJadwal> {
         // Update minimalMemberList based on the Dolan instances
         minimalMemberList =
             dolanList.map<int>((dolan) => dolan.jumlah_minimal).toList();
+        minimalMember = dolanList.first.jumlah_minimal;
       });
     } catch (e) {
       print('Error loading dolan list: $e');
@@ -109,7 +122,7 @@ class _AddJadwalState extends State<AddJadwal> {
   void initState() {
     super.initState();
     Future<String> userOnly = checkUser();
-    userOnly.then((value){
+    userOnly.then((value) {
       userId = value;
       loadDolanList();
     });
@@ -137,6 +150,7 @@ class _AddJadwalState extends State<AddJadwal> {
                     lastDate: DateTime(2100),
                   ).then((value) {
                     if (value != null) {
+                      dtPicker = value;
                       tanggalController.text =
                           value.toLocal().toString().split(' ')[0];
                     }
@@ -156,6 +170,7 @@ class _AddJadwalState extends State<AddJadwal> {
                     initialTime: TimeOfDay.now(),
                   ).then((value) {
                     if (value != null) {
+                      tPicker = value;
                       jamController.text = value.format(context);
                     }
                   });

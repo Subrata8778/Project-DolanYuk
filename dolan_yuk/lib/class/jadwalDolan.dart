@@ -6,6 +6,7 @@ class JadwalDolan {
   final String alamat;
   final String photo;
   final int jumlahPemain;
+  final int banyakPemain;
 
   JadwalDolan({
     required this.id,
@@ -15,6 +16,7 @@ class JadwalDolan {
     required this.alamat,
     required this.photo,
     required this.jumlahPemain,
+    required this.banyakPemain,
   });
 
   factory JadwalDolan.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class JadwalDolan {
       alamat: json['alamat'],
       photo: json["photo"],
       jumlahPemain: json['jumlah_minimal'] as int,
+      banyakPemain: json['banyak_member'] as int,
     );
   }
 }
