@@ -1,5 +1,7 @@
 import 'package:dolan_yuk/class/jadwalDolan.dart';
 import 'package:dolan_yuk/class/dolan.dart';
+import 'package:dolan_yuk/main.dart';
+import 'package:dolan_yuk/screen/jadwal.dart';
 import 'package:flutter/material.dart';
 import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:http/http.dart' as http;
@@ -94,7 +96,11 @@ class _AddJadwalState extends State<AddJadwal> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         // Navigator.of(context).pop();
-        Navigator.pushNamed(context, 'jadwal');
+        // Navigator.pushNamed(context, 'jadwal');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => JadwalScreen()),
+        );
       }
     } else {
       ScaffoldMessenger.of(context)
@@ -138,7 +144,7 @@ class _AddJadwalState extends State<AddJadwal> {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TextFormField(
                 controller: tanggalController,

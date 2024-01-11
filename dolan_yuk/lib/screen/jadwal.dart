@@ -139,18 +139,19 @@ class _JadwalScreenState extends State<JadwalScreen> {
                 return Card(
                   margin: EdgeInsets.all(8.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Foto
                       Container(
-                          width: double.infinity,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(_jadwalList[index].photo),
-                              fit: BoxFit.cover,
-                            ),
-                            // shape: BoxShape.circle,
-                          )),
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(_jadwalList[index].photo),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                       // Informasi Dolanan
                       ListTile(
                         title: Text(
@@ -163,28 +164,36 @@ class _JadwalScreenState extends State<JadwalScreen> {
                       // Tanggal dan Jam
                       ListTile(
                         leading: Icon(Icons.calendar_today),
-                        title:
-                            Text("${DateFormat('dd-MM-yyyy').format(_jadwalList[index].timestamp)}"),
+                        title: Text(
+                          "${DateFormat('dd-MM-yyyy').format(_jadwalList[index].timestamp)}",
+                        ),
                       ),
                       ListTile(
                         leading: Icon(Icons.punch_clock),
-                        title:
-                            Text("${DateFormat('HH:mm').format(_jadwalList[index].timestamp)}"),
+                        title: Text(
+                          "${DateFormat('HH:mm').format(_jadwalList[index].timestamp)}",
+                        ),
                       ),
-                      // Jumlah Pemain
-                      ElevatedButton(
-                        onPressed: () {
-                          tampilkanAnggotaBergabung(
-                              _jadwalList[index].id.toString());
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.car_rental_outlined),
-                            SizedBox(width: 8.0),
-                            Text(
-                                "${_jadwalList[index].banyakPemain} / ${_jadwalList[index].jumlahPemain} orang"),
-                          ],
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child:
+                            // Jumlah Pemain
+                            ElevatedButton(
+                          onPressed: () {
+                            tampilkanAnggotaBergabung(
+                              _jadwalList[index].id.toString(),
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.car_rental_outlined),
+                              SizedBox(width: 8.0),
+                              Text(
+                                "${_jadwalList[index].banyakPemain} / ${_jadwalList[index].jumlahPemain} orang",
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // Nama Tempat
@@ -197,18 +206,29 @@ class _JadwalScreenState extends State<JadwalScreen> {
                         leading: Icon(Icons.location_on),
                         title: Text(_jadwalList[index].alamat),
                       ),
-                      // Tombol Group Chat
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    Ngobrol(_jadwalList[index].id.toString())),
-                          );
-                        },
-                        child: Text("Party Chat"),
-                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            // Tombol Group Chat
+                            Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Ngobrol(
+                                      _jadwalList[index].id.toString(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text("Party Chat"),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 );

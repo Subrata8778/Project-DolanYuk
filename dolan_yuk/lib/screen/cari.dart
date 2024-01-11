@@ -221,75 +221,89 @@ class _CariState extends State<Cari> {
               itemBuilder: (context, index) {
                 return Card(
                   margin: EdgeInsets.all(8.0),
-                  child: Column(children: [
-                    // Foto
-                    Container(
-                        width: double.infinity,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(_jadwalList[index].photo),
-                            fit: BoxFit.cover,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Foto
+                        Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(_jadwalList[index].photo),
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          // shape: BoxShape.circle,
-                        )),
-                    // Informasi Dolanan
-                    ListTile(
-                      title: Text(
-                        _jadwalList[index].nama,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                    // Tanggal dan Jam
-                    ListTile(
-                      leading: Icon(Icons.calendar_today),
-                      title: Text(
-                        "${DateFormat('dd-MM-yyyy').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
-                      ),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.punch_clock),
-                      title: Text(
-                        "${DateFormat('HH:mm').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
-                      ),
-                    ),
-                    // Jumlah Pemain
-                    ElevatedButton(
-                      onPressed: () {
-                        tampilkanAnggotaBergabung(
-                            _jadwalList[index].id.toString());
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.car_rental_outlined),
-                          SizedBox(width: 8.0),
-                          Text(
-                              "${_jadwalList[index].banyakPemain} / ${_jadwalList[index].jumlahPemain} orang"),
-                        ],
-                      ),
-                    ),
-                    // Nama Tempat
-                    ListTile(
-                      leading: Icon(Icons.house),
-                      title: Text(_jadwalList[index].lokasi),
-                    ),
-                    // Alamat
-                    ListTile(
-                      leading: Icon(Icons.location_on),
-                      title: Text(_jadwalList[index].alamat),
-                    ),
-                    SizedBox(width: 8.0),
-                    ElevatedButton(
-                      onPressed: (_jadwalList[index].banyakPemain <
-                              _jadwalList[index].jumlahPemain)
-                          ? () => Join(_jadwalList[index].id.toString())
-                          : null,
-                      child: Text('Join'),
-                    ),
-                  ]),
+                        // Informasi Dolanan
+                        ListTile(
+                          title: Text(
+                            _jadwalList[index].nama,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // Tanggal dan Jam
+                        ListTile(
+                          leading: Icon(Icons.calendar_today),
+                          title: Text(
+                            "${DateFormat('dd-MM-yyyy').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
+                          ),
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.punch_clock),
+                          title: Text(
+                            "${DateFormat('HH:mm').format(DateTime.parse(_jadwalList[index].timestamp.toString()))}",
+                          ),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child:
+                                // Jumlah Pemain
+                                ElevatedButton(
+                              onPressed: () {
+                                tampilkanAnggotaBergabung(
+                                    _jadwalList[index].id.toString());
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.car_rental_outlined),
+                                  SizedBox(width: 8.0),
+                                  Text(
+                                      "${_jadwalList[index].banyakPemain} / ${_jadwalList[index].jumlahPemain} orang"),
+                                ],
+                              ),
+                            )),
+                        // Nama Tempat
+                        ListTile(
+                          leading: Icon(Icons.house),
+                          title: Text(_jadwalList[index].lokasi),
+                        ),
+                        // Alamat
+                        ListTile(
+                          leading: Icon(Icons.location_on),
+                          title: Text(_jadwalList[index].alamat),
+                        ),
+                        SizedBox(width: 8.0),
+                        Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                                // Join Button
+                                Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton.icon(
+                                onPressed: (_jadwalList[index].banyakPemain <
+                                        _jadwalList[index].jumlahPemain)
+                                    ? () =>
+                                        Join(_jadwalList[index].id.toString())
+                                    : null,
+                                icon: Icon(Icons.exit_to_app),
+                                label: Text('Join'),
+                              ),
+                            )),
+                      ]),
                 );
               },
             ),

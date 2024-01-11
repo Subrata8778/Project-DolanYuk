@@ -1,5 +1,6 @@
 import 'package:dolan_yuk/screen/addjadwal.dart';
 import 'package:dolan_yuk/screen/cari.dart';
+import 'package:dolan_yuk/screen/gantipassword.dart';
 import 'package:dolan_yuk/screen/jadwal.dart';
 import 'package:dolan_yuk/screen/login.dart';
 import 'package:dolan_yuk/screen/ngobrol.dart';

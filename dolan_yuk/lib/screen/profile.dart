@@ -1,3 +1,4 @@
+import 'package:dolan_yuk/screen/gantipassword.dart';
 import 'package:flutter/material.dart';
 import 'package:dolan_yuk/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -147,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: 600,
+          height: 550,
           margin: EdgeInsets.all(20),
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -225,30 +226,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Container(
-                    height: 50,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        doUpdate();
-                      },
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.blueAccent),
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: Padding(
+              //     padding: EdgeInsets.all(10),
+              //     child: Container(
+              //       height: 50,
+              //       width: 200,
+              //       decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.circular(20),
+              //       ),
+              //       child: ElevatedButton(
+              //         onPressed: () {
+              //           doUpdate();
+              //         },
+              //         style: ButtonStyle(
+              //           backgroundColor:
+              //               MaterialStateProperty.all<Color>(Colors.deepPurple),
+              //         ),
+              //         child: Text(
+              //           'Simpan',
+              //           style: TextStyle(color: Colors.white, fontSize: 25),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        border: Border.all(color: Colors.deepPurple, width: 2),
                       ),
-                      child: Text(
-                        'Simpan',
-                        style: TextStyle(color: Colors.white, fontSize: 25),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => GantiPassword()),
+                          );
+                        },
+                        style: ButtonStyle(
+                          shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.transparent),
+                          elevation: MaterialStateProperty.all<double>(0),
+                        ),
+                        child: Text(
+                          'Ganti Password',
+                          style: TextStyle(color: Colors.deepPurple, fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
+                    Container(
+                      height: 50,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          doUpdate();
+                        },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.deepPurple),
+                          elevation: MaterialStateProperty.all<double>(0),
+                        ),
+                        child: Text(
+                          'Simpan',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
