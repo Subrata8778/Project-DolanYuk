@@ -120,16 +120,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              'Tulisan Tombol',
-              style: TextStyle(fontSize: 16.0),
-            ),
-            IconButton(
-              icon: Icon(Icons.arrow_forward),
+            TextButton(
               onPressed: () {
                 doLogOut();
               },
-            ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  SizedBox(width: 8.0), // Jarak antara teks dan ikon
+                  Icon(Icons.logout),
+                ],
+              ),
+            )
           ],
         ),
         Container(

@@ -91,7 +91,7 @@ class _CariState extends State<Cari> {
     }
   }
 
-  void searchJadwal(String keyword) async {
+  Future<void> searchJadwal(String keyword) async {
     // Melakukan pencarian berdasarkan nama dolan
     try {
       final response = await http.post(
@@ -205,9 +205,8 @@ class _CariState extends State<Cari> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: searchController,
-              onChanged: (value) {
-                // Memanggil metode pencarian ketika nilai berubah
-                searchJadwal(value);
+              onChanged: (value) async {
+                await searchJadwal(value);
               },
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),
