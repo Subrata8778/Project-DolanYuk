@@ -26,7 +26,6 @@ class _JadwalScreenState extends State<JadwalScreen> {
         Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/jadwal.php"),
         body: {'users_id': userId.toString()});
     if (response.statusCode == 200) {
-      // print(response.body);
       return response.body;
     } else {
       throw Exception('Failed to read API');
@@ -39,12 +38,10 @@ class _JadwalScreenState extends State<JadwalScreen> {
     data.then((value) {
       Map json = jsonDecode(value);
       for (var jad in json['data']) {
-        print(jad);
         JadwalDolan jd = JadwalDolan.fromJson(jad);
         _jadwalList.add(jd);
       }
       setState(() {});
-      // print(_jadwalList);
     });
   }
 

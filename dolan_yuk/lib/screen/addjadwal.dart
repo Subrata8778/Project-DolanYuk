@@ -1,4 +1,9 @@
+import 'package:dolan_yuk/class/jadwalDolan.dart';
+import 'package:dolan_yuk/class/dolan.dart';
 import 'package:flutter/material.dart';
+import 'package:dolan_yuk/screen/addjadwal.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddJadwal extends StatefulWidget {
   @override
@@ -17,108 +22,190 @@ class _AddJadwalState extends State<AddJadwal> {
   int minimalMember = 0; // Jumlah minimal member dari dolan utama
 
   // Data dummy untuk dropdown (anda dapat menggantinya dengan data dari API)
-  List<String> dolanList = ['Dolan1', 'Dolan2', 'Dolan3'];
+  List<Dolan> dolanList = [];
+
+  // Initialize minimalMemberList
+  List<int> minimalMemberList = [];
+
+  Future<List> daftarDolan() async {
+    Map json;
+    final response = await http.post(
+      Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/dolan.php"),
+    );
+    if (response.statusCode == 200) {
+      json = jsonDecode(response.body);
+      return json['data'];
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  void addJadwal() async {
+    DateTime tanggal =
+        DateTime.tryParse(tanggalController.text) ?? DateTime.now();
+
+    // Temukan indeks objek Dolan yang sesuai dengan nama yang dipilih
+    int selectedDolanIndex =
+        dolanList.indexWhere((dolan) => dolan.nama == selectedDolan);
+
+    // Gunakan objek Dolan yang sesuai atau objek default jika tidak ditemukan
+    Dolan selectedDolanObj = selectedDolanIndex != -1
+        ? dolanList[selectedDolanIndex]
+        : Dolan(id: 0, nama: '', jumlah_minimal: 0, photo: '');
+    print(selectedDolanObj.id);
+
+    // Dapatkan foto dari objek Dolan yang sudah ada
+    String photo = selectedDolanObj.photo;
+
+    final response = await http.post(
+        Uri.parse("https://ubaya.me/flutter/160420002/DolanYuk/addjadwal.php"),
+        body: {
+          'tanggal': tanggal.toUtc().toString().split('.')[0],
+          'lokasi': lokasiController.text,
+          'alamat': alamatController.text,
+          'users_id': '1',
+          'dolans_id': selectedDolanObj.id.toString(),
+          'jadwals_id': selectedDolanIndex.toString(),
+        });
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
+        Navigator.of(context).pop();
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error')));
+      throw Exception('Failed to read API');
+    }
+  }
+
+  Future<void> loadDolanList() async {
+    try {
+      List<dynamic> data = await daftarDolan();
+      setState(() {
+        dolanList = data.map<Dolan>((item) => Dolan.fromJSON(item)).toList();
+        // Update minimalMemberList based on the Dolan instances
+        minimalMemberList =
+            dolanList.map<int>((dolan) => dolan.jumlah_minimal).toList();
+      });
+    } catch (e) {
+      print('Error loading dolan list: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadDolanList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tambah Jadwal Dolan'),
+        title: Text('Buat Jadwal'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tanggal Dolan'),
-            TextFormField(
-              controller: tanggalController,
-              onTap: () {
-                // Tampilkan date picker saat input tanggal di-tap
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2100),
-                ).then((value) {
-                  if (value != null) {
-                    tanggalController.text =
-                        value.toLocal().toString().split(' ')[0];
-                  }
-                });
-              },
-            ),
-            SizedBox(height: 16.0),
-            Text('Jam Dolan'),
-            TextFormField(
-              controller: jamController,
-              onTap: () {
-                // Tampilkan time picker saat input jam di-tap
-                showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                ).then((value) {
-                  if (value != null) {
-                    jamController.text = value.format(context);
-                  }
-                });
-              },
-            ),
-            SizedBox(height: 16.0),
-            Text('Lokasi Dolan'),
-            TextFormField(
-              controller: lokasiController,
-            ),
-            SizedBox(height: 16.0),
-            Text('Alamat Dolan'),
-            TextFormField(
-              controller: alamatController,
-            ),
-            SizedBox(height: 16.0),
-            Text('Pilih Dolan Utama'),
-            DropdownButton<String>(
-              value: selectedDolan,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedDolan = newValue!;
-                  // Anda dapat mengambil jumlah minimal member dari tabel dolanan berdasarkan selectedDolan
-                  // minimalMember = fetchMinimalMember(selectedDolan);
-                  // Secara sementara, set minimalMember ke 3 sebagai contoh
-                  minimalMember = 3;
-                });
-              },
-              items: dolanList.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 16.0),
-            Text('Minimal Member: $minimalMember'),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                // Tambahkan logika untuk menyimpan jadwal baru
-                saveJadwal();
-              },
-              child: Text('Buat Jadwal'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: tanggalController,
+                onTap: () {
+                  showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2100),
+                  ).then((value) {
+                    if (value != null) {
+                      tanggalController.text =
+                          value.toLocal().toString().split(' ')[0];
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Tanggal Dolan',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: jamController,
+                onTap: () {
+                  showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  ).then((value) {
+                    if (value != null) {
+                      jamController.text = value.format(context);
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Jam Dolan',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: lokasiController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Lokasi Dolan',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: alamatController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Alamat Dolan',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              DropdownButton<Dolan>(
+                value: dolanList.firstWhere(
+                    (dolan) => dolan.nama == selectedDolan,
+                    orElse: () => dolanList.first),
+                onChanged: (Dolan? newValue) {
+                  setState(() {
+                    selectedDolan = newValue!.nama;
+                    int selectedDolanIndex = dolanList.indexOf(newValue);
+                    minimalMember = (selectedDolanIndex >= 0)
+                        ? minimalMemberList[selectedDolanIndex]
+                        : 0;
+                  });
+                },
+                items: dolanList.isNotEmpty
+                    ? dolanList.map<DropdownMenuItem<Dolan>>((Dolan dolan) {
+                        return DropdownMenuItem<Dolan>(
+                          value: dolan,
+                          child: Text(dolan.nama),
+                        );
+                      }).toList()
+                    : [],
+              ),
+              SizedBox(height: 16.0),
+              Text('Minimal Member: $minimalMember'),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  addJadwal();
+                },
+                child: Text('Buat Jadwal'),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  // Implementasi fungsi untuk menyimpan jadwal baru
-  void saveJadwal() {
-    // Logika untuk menyimpan data jadwal ke database/API
-    // ...
-
-    // Secara otomatis pemain yang membuat jadwal ini menjadi anggota dari jadwal baru ini
-    // ...
-
-    // Kembali ke halaman sebelumnya setelah menyimpan jadwal
-    Navigator.pop(context);
   }
 }
