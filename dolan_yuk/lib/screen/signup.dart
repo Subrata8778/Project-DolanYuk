@@ -47,7 +47,7 @@ class _RegisterState extends State<Register> {
               'nama': _nama,
               'email': _email,
               'photo':
-                  "https://static.wikia.nocookie.net/larva-animation/images/6/6a/BrownPose.png/revision/latest?cb=20210418181805",
+                  "https://imgv3.fotor.com/images/side/Blur-photo-by-Fotor.jpg",
               'user_password': _password
             });
         if (response.statusCode == 200) {

@@ -112,13 +112,18 @@ class _AddJadwalState extends State<AddJadwal> {
   Future<void> loadDolanList() async {
     try {
       List<dynamic> data = await daftarDolan();
-      setState(() {
-        dolanList = data.map<Dolan>((item) => Dolan.fromJSON(item)).toList();
-        // Update minimalMemberList based on the Dolan instances
-        minimalMemberList =
-            dolanList.map<int>((dolan) => dolan.jumlah_minimal).toList();
-        minimalMember = dolanList.first.jumlah_minimal;
-      });
+      if (data.isNotEmpty) {
+        setState(() {
+          dolanList = data.map<Dolan>((item) => Dolan.fromJSON(item)).toList();
+          minimalMemberList =
+              dolanList.map<int>((dolan) => dolan.jumlah_minimal).toList();
+          minimalMember = dolanList.first.jumlah_minimal;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No Dolan data available')),
+        );
+      }
     } catch (e) {
       print('Error loading dolan list: $e');
     }

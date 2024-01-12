@@ -76,7 +76,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                           backgroundImage: NetworkImage(anggota['photo']),
                         ),
                         title: Text(
-                          anggota['users_id'] == userId
+                          anggota['users_id'].toString() == userId
                               ? '${anggota['nama']} (You)'
                               : anggota['nama'],
                         ),

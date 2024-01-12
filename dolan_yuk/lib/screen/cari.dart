@@ -147,7 +147,7 @@ class _CariState extends State<Cari> {
                           backgroundImage: NetworkImage(anggota['photo']),
                         ),
                         title: Text(
-                          anggota['users_id'] == userId
+                          anggota['users_id'].toString() == userId
                               ? '${anggota['nama']} (You)'
                               : anggota['nama'],
                         ),
