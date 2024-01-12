@@ -15,9 +15,10 @@ class GantiPassword extends StatefulWidget {
 class _GantiPasswordState extends State<GantiPassword> {
   String _password = '';
   String _new_password = '';
+  String _new_password_check = '';
   String error_login = '';
   String userId = "";
-  
+
   Future<void> doLogOut() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("user_id", "");
@@ -35,29 +36,34 @@ class _GantiPasswordState extends State<GantiPassword> {
 
   void doUpdate() async {
     if (_new_password != "" && _password != "") {
-      final response = await http.post(
-          Uri.parse(
-              "https://ubaya.me/flutter/160420002/DolanYuk/updatePassword.php"),
-          body: {
-          'password': _password, 
-          'new_password': _new_password,
-          'user_id': userId});
-      if (response.statusCode == 200) {
-        Map json = jsonDecode(response.body);
-        if (json['result'] == 'success') {
-          Navigator.push(
+      if (_new_password == _new_password_check) {
+        final response = await http.post(
+            Uri.parse(
+                "https://ubaya.me/flutter/160420002/DolanYuk/updatePassword.php"),
+            body: {
+              'password': _password,
+              'new_password': _new_password,
+              'user_id': userId
+            });
+        if (response.statusCode == 200) {
+          Map json = jsonDecode(response.body);
+          if (json['result'] == 'success') {
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfileScreen()),
             );
-          showDialogMsg("Berhasil Update!", "Ganti password berhasil!");
+            showDialogMsg("Berhasil Update!", "Ganti password berhasil!");
+          } else {
+            showDialogMsg("Gagal Update!", "Pastikan password sesuai!");
+            setState(() {
+              error_login = "Incorrect user or password";
+            });
+          }
         } else {
-          showDialogMsg("Gagal Update!", "Pastikan password sesuai!");
-          setState(() {
-            error_login = "Incorrect user or password";
-          });
+          throw Exception('Failed to read API');
         }
       } else {
-        throw Exception('Failed to read API');
+        showDialogMsg("Gagal Update!", "Password pengulangan salah!");
       }
     } else {
       showDialogMsg("Gagal Update!",
@@ -92,7 +98,7 @@ class _GantiPasswordState extends State<GantiPassword> {
           title: Text('Login'),
         ),
         body: Container(
-          height: 350,
+          height: 400,
           margin: EdgeInsets.all(20),
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -126,6 +132,20 @@ class _GantiPasswordState extends State<GantiPassword> {
                     border: OutlineInputBorder(),
                     labelText: 'Password Baru',
                     hintText: 'Masukkan Password Baru Anda'),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              //padding: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
+                onChanged: (v) {
+                  _new_password_check = v;
+                },
+                obscureText: true,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Re-Type Password Baru',
+                    hintText: 'Ulangi Password Baru Anda'),
               ),
             ),
             Padding(

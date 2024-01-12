@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 // class MyChat extends StatelessWidget {
 //   @override
@@ -40,6 +41,7 @@ class _NgobrolState extends State<Ngobrol> {
   }
 
   bacaData() {
+    messages.clear();
     Future<String> data = fetchData();
     data.then((value) {
       Map json = jsonDecode(value);
@@ -82,6 +84,13 @@ class _NgobrolState extends State<Ngobrol> {
     userOnly.then((value) {
       userId = value;
       bacaData();
+    });
+
+    Timer.periodic(Duration(seconds: 3), (Timer timer) {
+      // Check if the widget is still mounted to avoid setState on disposed widget.
+        setState(() {
+          bacaData();
+        });
     });
   }
 
