@@ -16,13 +16,32 @@ class _GantiPasswordState extends State<GantiPassword> {
   String _password = '';
   String _new_password = '';
   String error_login = '';
+  String userId = "";
+  
+  Future<void> doLogOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("user_id", "");
+    main();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future<String> userOnly = checkUser();
+    userOnly.then((value) {
+      userId = value;
+    });
+  }
 
   void doUpdate() async {
     if (_new_password != "" && _password != "") {
       final response = await http.post(
           Uri.parse(
               "https://ubaya.me/flutter/160420002/DolanYuk/updatePassword.php"),
-          body: {'password': _password, 'new_password': _new_password});
+          body: {
+          'password': _password, 
+          'new_password': _new_password,
+          'user_id': userId});
       if (response.statusCode == 200) {
         Map json = jsonDecode(response.body);
         if (json['result'] == 'success') {
