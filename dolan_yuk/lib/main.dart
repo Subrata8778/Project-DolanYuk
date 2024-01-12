@@ -77,6 +77,55 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text("DolanYuk"),
       ),
       body: _screens[_currentIndex],
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Jadwal'),
+              leading: Icon(Icons.calendar_month),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 0;
+                  Navigator.pop(context);
+                });
+              },
+            ),
+            ListTile(
+              title: Text('Cari'),
+              leading: Icon(Icons.search_sharp),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 1;
+                  Navigator.pop(context);
+                });
+              },
+            ),
+            ListTile(
+              title: Text('Profil'),
+              leading: Icon(Icons.person),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 2;
+                  Navigator.pop(context);
+                });
+              },
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: _currentIndex == 0
           ? FloatingActionButton(
               onPressed: () {
